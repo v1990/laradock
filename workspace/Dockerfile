@@ -31,7 +31,10 @@ ENV PUID ${PUID}
 ARG PGID=1000
 ENV PGID ${PGID}
 
-RUN groupadd -g ${PGID} laradock && \
+# always run apt update when start and after add new source list, then clean up at end.
+RUN apt-get update -yqq && \
+    pecl channel-update pecl.php.net && \
+    groupadd -g ${PGID} laradock && \
     useradd -u ${PUID} -g laradock -m laradock -G docker_env && \
     usermod -p "*" laradock
 
@@ -183,6 +186,19 @@ RUN if [ ${INSTALL_IMAP} = true ]; then \
 ;fi
 
 ###########################################################################
+# Subversion:
+###########################################################################
+
+USER root
+
+ARG INSTALL_SUBVERSION=false
+
+RUN if [ ${INSTALL_SUBVERSION} = true ]; then \
+    apt-get install -y subversion \
+;fi
+
+
+###########################################################################
 # xDebug:
 ###########################################################################
 
@@ -290,7 +306,11 @@ ARG PHP_VERSION=${PHP_VERSION}
 
 RUN if [ ${INSTALL_SWOOLE} = true ]; then \
     # Install Php Swoole Extension
-    pecl -q install swoole && \
+    if [ $(php -r "echo PHP_MAJOR_VERSION;") = "5" ]; then \
+      pecl -q install swoole-2.0.11; \
+    else \
+      pecl -q install swoole; \
+    fi && \
     echo "extension=swoole.so" >> /etc/php/${PHP_VERSION}/mods-available/swoole.ini && \
     ln -s /etc/php/${PHP_VERSION}/mods-available/swoole.ini /etc/php/${PHP_VERSION}/cli/conf.d/20-swoole.ini \
 ;fi
@@ -299,13 +319,18 @@ RUN if [ ${INSTALL_SWOOLE} = true ]; then \
 # Drush:
 ###########################################################################
 
+# Deprecated install of Drush 8 and earlier versions.
+# Drush 9 and up require Drush to be listed as a composer dependency of your site.
+
 USER root
 
 ARG INSTALL_DRUSH=false
+ARG DRUSH_VERSION
+ENV DRUSH_VERSION ${DRUSH_VERSION}
 
 RUN if [ ${INSTALL_DRUSH} = true ]; then \
     apt-get -y install mysql-client && \
-    # Install Drush 8 with the phar file.
+    # Install Drush with the phar file.
     curl -fsSL -o /usr/local/bin/drush https://github.com/drush-ops/drush/releases/download/${DRUSH_VERSION}/drush.phar | bash && \
     chmod +x /usr/local/bin/drush && \
     drush core-status \
@@ -415,6 +440,7 @@ USER root
 
 ARG INSTALL_AEROSPIKE=false
 ARG PHP_VERSION=${PHP_VERSION}
+ARG AEROSPIKE_PHP_REPOSITORY
 
 RUN if [ ${INSTALL_AEROSPIKE} = true ]; then \
     # Fix dependencies for PHPUnit within aerospike extension
@@ -641,8 +667,8 @@ ARG INSTALL_PYTHON=false
 
 RUN if [ ${INSTALL_PYTHON} = true ]; then \
   apt-get -y install python python-pip python-dev build-essential  \
-  && pip install --upgrade pip  \
-  && pip install --upgrade virtualenv \
+  && python -m pip install --upgrade pip  \
+  && python -m pip install --upgrade virtualenv \
 ;fi
 
 ###########################################################################
