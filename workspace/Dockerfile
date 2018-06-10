@@ -753,6 +753,10 @@ RUN php -v | head -n 1 | grep -q "PHP ${PHP_VERSION}."
 
 USER root
 
+# 安装常用软件
+RUN apt-get update -y  && \
+    apt-get install -y net-tools inetutils-ping
+
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
