@@ -776,7 +776,7 @@ RUN if [ ${INSTALL_PG_CLIENT} = true ]; then \
 USER root
 
 RUN apt-get update -yqq \
-    && apt-get -yqq install nasm 
+    && apt-get -yqq install nasm
 
 ###########################################################################
 # Dusk Dependencies:
@@ -823,11 +823,15 @@ USER root
 # 安装常用软件
 RUN apt-get update -y  && \
     apt-get install -y net-tools inetutils-ping
+RUN apt-get install -y screen
 
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
 
+# 添加www用户
+RUN groupadd -r www && useradd -r -g www www
+# USER www
 # Set default work directory
 WORKDIR /var/www
