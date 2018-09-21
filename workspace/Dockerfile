@@ -757,10 +757,19 @@ USER root
 RUN apt-get update -y  && \
     apt-get install -y net-tools inetutils-ping
 
+RUN apt-get install -y zsh-dev
+RUN apt-get install -y wget
+RUN apt-get install -y screen
+# RUN sh -c "$(wget https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+
+
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
     rm /var/log/lastlog /var/log/faillog
 
+
+ARG WORKSPACE_WORKDIR=/var/www
+
 # Set default work directory
-WORKDIR /var/www
+WORKDIR ${WORKSPACE_WORKDIR}

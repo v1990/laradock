@@ -92,6 +92,7 @@ services:
           - TZ=${WORKSPACE_TIMEZONE}
           - BLACKFIRE_CLIENT_ID=${BLACKFIRE_CLIENT_ID}
           - BLACKFIRE_CLIENT_TOKEN=${BLACKFIRE_CLIENT_TOKEN}
+          - WORKSPACE_WORKDIR=${WORKSPACE_WORKDIR}
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
       extra_hosts:
@@ -179,6 +180,7 @@ services:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
         - ${NGINX_HOST_LOG_PATH}:/var/log/nginx
         - ${NGINX_SITES_PATH}:/etc/nginx/sites-available
+        - ${DATA_PATH_HOST}/certbot/certs/:/var/certs
       ports:
         - "${NGINX_HOST_HTTP_PORT}:80"
         - "${NGINX_HOST_HTTPS_PORT}:443"
@@ -264,6 +266,7 @@ services:
       volumes:
         - ${DATA_PATH_HOST}/mysql:/var/lib/mysql
         - ${MYSQL_ENTRYPOINT_INITDB}:/docker-entrypoint-initdb.d
+        - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
       ports:
         - "${MYSQL_PORT}:3306"
       networks:
@@ -360,11 +363,15 @@ services:
 
 ### MongoDB ##############################################
     mongo:
-      build: ./mongo
+      build: 
+        context: ./mongo
+        args:
+            - MONGO_VERSION=${MONGO_VERSION}
       ports:
         - "${MONGODB_PORT}:27017"
       volumes:
         - ${DATA_PATH_HOST}/mongo:/data/db
+        - ${DATA_PATH_HOST}/mongo_logs:/data/logs
       networks:
         - backend
 
@@ -551,11 +558,12 @@ services:
       build:
         context: ./certbot
       volumes:
-        - ./data/certbot/certs/:/var/certs
-        - ./certbot/letsencrypt/:${APP_CODE_PATH_CONTAINER}/letsencrypt
+        - ${DATA_PATH_HOST}/certbot/certs/:/var/certs
+        # - ${APP_CODE_PATH_HOST}/wwwroot/GZ_BI-api/backend/web/:${APP_CODE_PATH_CONTAINER}/letsencrypt
+        # - ./certbot/letsencrypt/:${APP_CODE_PATH_CONTAINER}/letsencrypt
       environment:
-        - CN="fake.domain.com"
-        - EMAIL="fake.email@gmail.com"
+        - CN="local.bi-api.etc.gplqdb.com"
+        - EMAIL="viggo.chen@wetax.com.cn"
       networks:
         - frontend
 

@@ -450,6 +450,8 @@ COPY ./xlaravel.pool.conf /usr/local/etc/php-fpm.d/
 
 USER root
 
+
+
 # Clean up
 RUN apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
@@ -460,5 +462,7 @@ RUN usermod -u 1000 www-data
 WORKDIR /var/www
 
 CMD ["php-fpm"]
+
+CMD echo "192.168.56.101 local.api-bi.etc.gplqdb.com" >> /etc/hosts
 
 EXPOSE 9000
