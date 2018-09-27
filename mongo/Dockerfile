@@ -1,12 +1,13 @@
-FROM mongo:latest
+ARG MONGO_VERSION=latest
+FROM mongo:${MONGO_VERSION}
 
 LABEL maintainer="Mahmoud Zalt <mahmoud@zalt.me>"
 
-#COPY mongo.conf /usr/local/etc/mongo/mongo.conf
+COPY config/mongo.conf /usr/local/etc/mongo/mongo.conf
 
-VOLUME /data/db /data/configdb
+VOLUME /data/db /data/configdb /data/logs
 
-CMD ["mongod"]
+CMD ["mongod","--config","/usr/local/etc/mongo/mongo.conf"]
 
 EXPOSE 27017
 
