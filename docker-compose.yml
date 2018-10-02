@@ -1262,3 +1262,21 @@ services:
         backend:
           aliases:
             - fetchmail
+### docker-compose-ui
+#### https://github.com/francescou/docker-compose-ui
+    docker-compose-ui:
+      restart: always
+      image: francescou/docker-compose-ui:latest
+      # container_name: docker_compose_ui
+      # hostname: docker_compose_ui
+      working_dir: /work
+      ports:
+        - 5000:5000
+      # environment:
+        # - 'WEB_CONSOLE_PATTERN=/web-console/?cid={containerName}&cmd={command}'
+      #working_dir: /home/user/docker-compose-ui/demo-projects
+      volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+          - ~/work:/work
+          #- /home/user/docker-compose-ui/demo-projects:/home/user/docker-compose-ui/demo-projects
+
