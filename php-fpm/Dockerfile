@@ -132,6 +132,12 @@ RUN if [ ${INSTALL_XDEBUG} = true ]; then \
   fi && \
   docker-php-ext-enable xdebug \
 ;fi
+# COPY xdebug-2.5.5.tgz /php-ext/xdebug.tgz
+# RUN if [ ${INSTALL_XDEBUG} = true ]; then \
+#   pecl install /php-ext/xdebug.tgz && \
+#   docker-php-ext-enable xdebug \
+# ;fi
+# RUN rm -rf php-ext/xdebug.tgz
 
 # Copy xdebug configuration for remote debugging
 COPY ./xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
