@@ -102,6 +102,7 @@ services:
           - BLACKFIRE_CLIENT_TOKEN=${BLACKFIRE_CLIENT_TOKEN}
       volumes:
         - ${APP_CODE_PATH_HOST}:${APP_CODE_PATH_CONTAINER}
+        - ${HOST_FONTS_PATH}:/usr/share/fonts/mac
       extra_hosts:
         - "dockerhost:${DOCKER_HOST_IP}"
       ports:

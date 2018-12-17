@@ -122,13 +122,13 @@ RUN if [ ${COMPOSER_REPO_PACKAGIST} ]; then \
     composer config -g repo.packagist composer ${COMPOSER_REPO_PACKAGIST} \
 ;fi
 
-ARG COMPOSER_GLOBAL_INSTALL=false
-ENV COMPOSER_GLOBAL_INSTALL ${COMPOSER_GLOBAL_INSTALL}
+# ARG COMPOSER_GLOBAL_INSTALL=false
+# ENV COMPOSER_GLOBAL_INSTALL ${COMPOSER_GLOBAL_INSTALL}
 
-RUN if [ ${COMPOSER_GLOBAL_INSTALL} = true ]; then \
-    # run the install
-    composer global install \
-;fi
+# RUN if [ ${COMPOSER_GLOBAL_INSTALL} = true ]; then \
+#     # run the install
+#     composer global install \
+# ;fi
 
 
 # Export composer vendor path
@@ -852,6 +852,34 @@ RUN if [ ${INSTALL_DUSK_DEPS} = true ]; then \
 
 RUN php -v | head -n 1 | grep -q "PHP ${LARADOCK_PHP_VERSION}."
 
+###### composer global install
+
+USER laradock
+
+RUN npm install -g phantomjs-prebuilt
+
+ARG COMPOSER_GLOBAL_INSTALL=false
+ENV COMPOSER_GLOBAL_INSTALL ${COMPOSER_GLOBAL_INSTALL}
+
+RUN if [ ${COMPOSER_GLOBAL_INSTALL} = true ]; then \
+    # run the install
+    composer global install \
+;fi
+
+
+
+RUN npm install -g typescript
+# 安装常用软件
+USER root
+RUN apt-get install -y screen htop
+## todo 安装 puppeteer 及其依赖
+USER root
+RUN  apt-get install -yq gconf-service libasound2 libatk1.0-0 libc6 libcairo2 libcups2 libdbus-1-3 libexpat1 libfontconfig1 libgcc1 libgconf-2-4 libgdk-pixbuf2.0-0 libglib2.0-0 libgtk-3-0 libnspr4 libpango-1.0-0 libpangocairo-1.0-0 libstdc++6 libx11-6 libx11-xcb1 libxcb1 libxcomposite1 libxcursor1 libxdamage1 libxext6 libxfixes3 libxi6 libxrandr2 libxrender1 libxss1 libxtst6 ca-certificates fonts-liberation libappindicator1 libnss3 lsb-release xdg-utils wget
+
+USER laradock
+RUN npm install -g puppeteer
+
+
 #
 #--------------------------------------------------------------------------
 # Final Touch
@@ -859,9 +887,6 @@ RUN php -v | head -n 1 | grep -q "PHP ${LARADOCK_PHP_VERSION}."
 #
 
 USER root
-
-
-RUN npm install -g phantomjs
 
 # Clean up
 RUN apt-get clean && \
