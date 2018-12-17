@@ -204,6 +204,7 @@ services:
         - "${NGINX_HOST_HTTPS_PORT}:443"
       depends_on:
         - php-fpm
+        - wordpress
       networks:
         - frontend
         - backend
@@ -288,6 +289,24 @@ services:
         - "${MYSQL_PORT}:3306"
       networks:
         - backend
+### wordpress ##############################################
+    wordpress:
+      depends_on:
+        - mysql
+      image: wordpress:latest
+      ports:
+        - "8000:80"
+      restart: always
+      environment:
+        WORDPRESS_DB_HOST: mysql:3306
+        WORDPRESS_DB_USER: root
+        WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      volumes:
+        - ${APP_CODE_PATH_HOST}/wwwroot/v1990/wordpress:/var/www/html
+      networks:
+        - backend
+        - frontend
+
 
 ### Percona ################################################
     percona:
